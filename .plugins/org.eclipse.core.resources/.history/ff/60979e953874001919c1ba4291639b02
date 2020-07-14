@@ -1,0 +1,86 @@
+package com.mansel.tombstone.controller;
+
+import static com.mansel.tombstone.constant.RestEndpointConstant.PATH_DELETE;
+import static com.mansel.tombstone.constant.RestEndpointConstant.PATH_LIST;
+import static com.mansel.tombstone.constant.RestEndpointConstant.PATH_PAGEABLE_LIST;
+import static com.mansel.tombstone.constant.RestEndpointConstant.PATH_SAVE;
+import static com.mansel.tombstone.constant.RestEndpointConstant.ROOT_CATEGORIES_PATH;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mansel.tombstone.config.PaginatorConfig;
+import com.mansel.tombstone.mapper.PageMapper;
+import com.mansel.tombstone.mapper.PagedDataMapper;
+import com.mansel.tombstone.mapper.ProductEntryTypeMapper;
+import com.mansel.tombstone.model.dto.PagedData;
+import com.mansel.tombstone.model.dto.ProductEntryTypeDto;
+import com.mansel.tombstone.model.dto.SortAndFilterDataDto;
+import com.mansel.tombstone.model.entitiy.ProductEntryType;
+import com.mansel.tombstone.service.ProductEntryTypeService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@RequestMapping(ROOT_PRODUCT_ENTRY_PATH)
+@RequiredArgsConstructor
+@Slf4j
+public class ProductEntryTypeController {
+	
+	private final ProductEntryTypeMapper mapper;
+	private final ProductEntryTypeService service;
+	private final PaginatorConfig paginatorConfig;
+	
+	@PostMapping(value = PATH_SAVE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> saveProductEntryType(@RequestBody ProductEntryTypeDto productEntryTypeDto) {
+		ProductEntryType productEntryType = service.saveProductEntryType(mapper.convertToEntity(productEntryTypeDto));
+		log.debug(productEntryType.getId() + " productEntryType persisted successfully");
+		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping(value = PATH_LIST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public List<ProductEntryTypeDto> getProductEntryTypes() {
+		log.info(PATH_LIST + " invoked");
+		List<ProductEntryType> productEntryTypes = service.getActiveProductEntryTypes();
+		List<ProductEntryTypeDto> productEntryTypeDtos = productEntryTypes.stream().map(mapper::convertToDto).collect(Collectors.toList());
+		return productEntryTypeDtos; 
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = PATH_PAGEABLE_LIST, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public PagedData<ProductEntryTypeDto> getPageableQuestions(@RequestBody SortAndFilterDataDto<ProductEntryTypeDto> sortDataDto,@RequestParam("pageSize") Optional<Integer> pageSize,
+            @RequestParam("page") Optional<Integer> page) throws IOException {
+		log.info(PATH_PAGEABLE_LIST + " invoked");
+		Page<ProductEntryType> pageableList = service.getPageAbleFilterList(sortDataDto.getFilter(),paginatorConfig.build(pageSize, page,sortDataDto.getSorts()));
+		
+		PagedData<ProductEntryTypeDto> pagedData = PagedDataMapper.INSTANCE.convertTo(
+				pageableList.getContent().stream().map(ProductEntryTypeMapper.INSTANCE::convertToDto).collect(Collectors.toList()),
+				PageMapper.INSTANCE.convertTo(pageableList));
+		return pagedData;
+	}
+
+	@PostMapping(value = PATH_DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> delete(@RequestBody Long id) {
+		service.deleteById(id);
+		return ResponseEntity.ok().build();
+	}
+
+	
+	
+	
+
+}

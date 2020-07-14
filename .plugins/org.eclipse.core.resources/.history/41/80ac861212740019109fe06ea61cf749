@@ -1,0 +1,5 @@
+package com.mansel.tombstone.controller;
+
+public class ProductEntryTypeController {
+
+}

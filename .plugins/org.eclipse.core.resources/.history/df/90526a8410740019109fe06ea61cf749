@@ -1,0 +1,48 @@
+package com.mansel.tombstone.model.entitiy;
+
+import java.io.Serializable;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
+
+import com.mansel.tombstone.constant.DatabaseConstant;
+import com.mansel.tombstone.model.entitiy.base.AbstractEntity;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Where(clause = DatabaseConstant.DELETE_WHERE_CLAUSE)
+@Entity
+@Table(name = Category.TABLE_NAME)
+@Access(AccessType.FIELD)
+@Getter
+@Setter
+public class ProductEntryType extends AbstractEntity implements Serializable  {
+	
+	private static final long serialVersionUID = 1L;  
+	public static final String TABLE_NAME = "T_PRODUCT_ENTRY__TYPE";  
+	private static final String SEQUENCE_NAME = TABLE_NAME + "_SEQ";
+	public static final String JOIN_COLUMN = "C_PRODUCTENTRYTYPE";
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_GENERATOR_NAME)
+	@SequenceGenerator(name = SEQUENCE_GENERATOR_NAME, sequenceName = SEQUENCE_NAME, initialValue = DatabaseConstant.SEQ_INITIAL_VALUE, allocationSize = 1)
+	private Long id;
+
+	@Column(name = "C_NAME")
+	private String name;
+
+	
+	
+	
+
+}

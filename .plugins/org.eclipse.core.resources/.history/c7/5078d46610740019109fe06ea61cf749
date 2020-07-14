@@ -1,0 +1,5 @@
+package com.mansel.tombstone.model.entitiy;
+
+public class ProductEntryType {
+
+}

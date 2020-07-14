@@ -1,0 +1,20 @@
+package com.mansel.tombstone.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+
+import com.mansel.tombstone.constant.EntityStatusType;
+import com.mansel.tombstone.model.entitiy.Category;
+import com.mansel.tombstone.model.entitiy.ProductEntryType;
+import com.mansel.tombstone.service.ProductEntryTypeService;
+
+public interface ProductEntryTypeRepository   extends JpaRepository<ProductEntryType, Long>, QuerydslPredicateExecutor<ProductEntryType>{
+
+	List<ProductEntryTypeService> findByEntityStatusType(EntityStatusType active);
+
+	ProductEntryType findByName(String name);
+	
+}
+

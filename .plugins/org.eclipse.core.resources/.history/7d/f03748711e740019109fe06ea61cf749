@@ -1,0 +1,87 @@
+package com.mansel.tombstone.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.mansel.tombstone.constant.EntityStatusType;
+import com.mansel.tombstone.exception.BusinessException;
+import com.mansel.tombstone.model.dto.ProductEntryTypeDto;
+import com.mansel.tombstone.model.entitiy.ProductEntryType;
+import com.mansel.tombstone.repository.ProductEntryTypeRepository;
+import com.mansel.tombstone.repository.ProductRepository;
+import com.mansel.tombstone.service.base.AbstractService;
+import com.querydsl.core.types.dsl.BooleanExpression;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Service
+
+@Getter
+@RequiredArgsConstructor
+public class ProductEntryTypeService extends AbstractService<ProductEntryType> implements Serializable  {
+
+	private static final long serialVersionUID = 4013174145094649484L;
+	private final ProductEntryTypeRepository repository;
+	private final ProductRepository productRepository;
+
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public List<ProductEntryType> getProductEntryTypes() {
+		return repository.findAll();
+	}
+	
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public List<ProductEntryType> getActiveProductEntryTypes() {
+		return repository.findByEntityStatusType(EntityStatusType.ACTIVE);
+	}
+
+	@Transactional
+	public ProductEntryType saveProductEntryType(ProductEntryType productEntryType) {
+		if (productEntryType.getId() != null && productEntryType.getId() > 0L) {
+			ProductEntryType entity = repository.findById(productEntryType.getId()).get();
+			if (!entity.getName().equalsIgnoreCase(productEntryType.getName())
+					&& repository.findByName(productEntryType.getName()) != null) {
+				throw new BusinessException(String
+						.format("(%s) adlı ProductEntryType tanımlı olduğu kayıt için güncellenmiyor.", productEntryType.getName()));
+			}
+			entity.setName(productEntryType.getName());
+			return save(entity);
+		}
+
+		ProductEntryType productEntryTypeEntity = repository.findByName(productEntryType.getName());
+		if (productEntryTypeEntity == null) {
+			return save(productEntryType);
+		}
+		throw new BusinessException(
+				String.format("(%s) adlı kategori tanımlı olduğu için eklenmiyor.", productEntryType.getName()));
+	}
+
+
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public Page<ProductEntryType> getPageAbleFilterList(ProductEntryTypeDto productEntryTypeDto, PageRequest pageable) {
+	
+//		BooleanExpression expression = QProductEntryType.productEntry.isNotNull();
+//		if (!Objects.isNull(productEntryTypeDto.getName())) {
+//			expression = expression.and(QProductEntryType.productEntry.name.containsIgnoreCase(StringUtils.trimWhitespace(productEntryTypeDto.getName())));
+//		}
+//		if (!Objects.isNull(productEntryTypeDto.getEntityStatusType())) {
+//			expression = expression.and(QProductEntryType.productEntryType.entityStatusType.eq(productEntryTypeDto.getEntityStatusType()));
+//		}
+//		return repository.findAll(expression, pageable);
+		
+		return null;
+	}
+
+
+	public List<ProductEntryType> getProductEntryTypeByStatusForActive() {
+		return repository.findByEntityStatusType(EntityStatusType.ACTIVE);
+	}
+}

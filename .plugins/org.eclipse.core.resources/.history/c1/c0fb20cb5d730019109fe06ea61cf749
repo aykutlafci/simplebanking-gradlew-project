@@ -1,0 +1,74 @@
+package com.mansel.tombstone.model.entitiy;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
+
+import com.mansel.tombstone.constant.DatabaseConstant;
+import com.mansel.tombstone.model.entitiy.base.AbstractEntity;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Where(clause = DatabaseConstant.DELETE_WHERE_CLAUSE)
+@Entity
+@Table(name = Customer.TABLE_NAME)
+@Access(AccessType.FIELD)
+@Getter
+@Setter
+public class Customer extends AbstractEntity implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	public static final String TABLE_NAME = "T_CUSTOMER";
+	private static final String SEQUENCE_NAME = TABLE_NAME + "_SEQ";
+	public static final String JOIN_COLUMN = "C_CUSTOMER_ID";
+	private static final String MAPPER_ENTITY_NAME = "customer";
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_GENERATOR_NAME)
+	@SequenceGenerator(name = SEQUENCE_GENERATOR_NAME, sequenceName = SEQUENCE_NAME, initialValue = DatabaseConstant.SEQ_INITIAL_VALUE, allocationSize = 1)
+	private Long id;
+
+	@Column(name = "C_COMPANY_NAME")
+	private String companyName;
+
+	@Column(name = "C_FIRST_NAME", length = 30)
+	private String firstName;
+
+	@Column(name = "C_LAST_NAME", length = 30)
+	private String lastName;
+	
+	@Column(name = "C_EMAIL", length = 30)
+	private String email;
+	
+	@Column(name = "C_PHONE", length = 20)
+	private String phone;
+	
+	@Column(name = "C_USER_ID" )
+	private Long userId;
+	
+	@Column(name = "C_STRIPE_ID" )
+	private String stripeId;
+	
+	@OneToMany(targetEntity = Address.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = MAPPER_ENTITY_NAME)
+	private Set<Address> addresses = new HashSet<Address>(0);
+	
+	@OneToMany(targetEntity = Order.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = MAPPER_ENTITY_NAME)
+	private Set<Order> orders = new HashSet<Order>(0);
+
+}

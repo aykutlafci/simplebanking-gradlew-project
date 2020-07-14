@@ -1,0 +1,5 @@
+package com.mansel.tombstone.repository;
+
+public interface ProductEntryTypeRepository {
+
+}

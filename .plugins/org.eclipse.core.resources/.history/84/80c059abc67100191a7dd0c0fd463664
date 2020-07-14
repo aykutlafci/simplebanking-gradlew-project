@@ -1,0 +1,57 @@
+package com.mansel.tombstone.service;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.mansel.tombstone.model.dto.OrderDto;
+import com.mansel.tombstone.model.entitiy.OrderProduct;
+import com.mansel.tombstone.model.entitiy.QOrderProduct;
+import com.mansel.tombstone.repository.OrderProductRepository;
+import com.mansel.tombstone.service.base.AbstractService;
+import com.querydsl.core.types.dsl.BooleanExpression;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@Getter
+@RequiredArgsConstructor
+public class OrderProductService extends AbstractService<OrderProduct> implements Serializable {
+
+	private static final long serialVersionUID = 4013174145094649484L;
+	private final OrderProductRepository repository;
+	
+	public OrderProduct findByOrderAndProduct(Long id, Long id2) {
+		return repository.findByOrderAndProduct(id,id2);
+	}
+	
+	
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public Page<OrderProduct> getPageAbleFilterList(OrderDto orderDto, PageRequest pageable) {
+		BooleanExpression expression = QOrderProduct.orderProduct.isNotNull();
+		if(!Objects.isNull(orderDto.getId())) {
+			expression = expression.and(QOrderProduct.orderProduct.order.id.equals(orderDto.getId()));
+		}
+		if (!Objects.isNull(orderDto.getType())) {
+			expression = expression.and(QOrderProduct.orderProduct.order.type.eq(orderDto.getType()));
+		}
+		if (!Objects.isNull(orderDto.getCustomerDto())&&!Objects.isNull(orderDto.getCustomerDto().getUserId())) {
+			expression = expression.and(QOrderProduct.orderProduct.order.customer.userId.eq(orderDto.getCustomerDto().getUserId()));
+		}		
+		return repository.findAll(expression, pageable);
+	}
+
+
+	public void deleteById(Long id) {
+		remove(find(id));
+	}
+
+
+
+}

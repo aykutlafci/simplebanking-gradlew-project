@@ -1,0 +1,94 @@
+package com.mansel.tombstone.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.mansel.tombstone.constant.EntityStatusType;
+import com.mansel.tombstone.exception.BusinessException;
+import com.mansel.tombstone.model.dto.ParameterTypeDto;
+import com.mansel.tombstone.model.entitiy.ParameterType;
+import com.mansel.tombstone.model.entitiy.QProductEntryType;
+import com.mansel.tombstone.repository.ParameterTypeRepository;
+import com.mansel.tombstone.repository.ProductRepository;
+import com.mansel.tombstone.service.base.AbstractService;
+import com.querydsl.core.types.dsl.BooleanExpression;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Service
+
+@Getter
+@RequiredArgsConstructor
+public class ParameterTypeService extends AbstractService<ParameterType> implements Serializable {
+
+	private static final long serialVersionUID = 4013174145094649484L;
+	private final ParameterTypeRepository repository;
+	private final ParameterTypeRepository parameterTypeRepository;
+
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public List<ParameterType> getparameterType() {
+		return repository.findAll();
+	}
+
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public List<ParameterType> getActiveParameterTypeDto() {
+		return repository.findByEntityStatusType(EntityStatusType.ACTIVE);
+	}
+
+	@Transactional
+	public ParameterType saveParameterType(ParameterType parameterType) {   
+		if (parameterType.getId() != null && parameterType.getId() > 0L) {
+			ParameterType entity = repository.findById(parameterType.getId()).get();
+			if (!entity.getName().equalsIgnoreCase(parameterType.getName())
+					&& repository.findByName(parameterType.getName()) != null) {
+				throw new BusinessException(
+						String.format("(%s) adlı parameterType tanımlı olduğu kayıt için güncellenmiyor.",
+								parameterType.getName()));
+			}
+			entity.setName(parameterType.getName());
+			return save(entity);
+		}
+
+		ParameterType parameterTypeEntity = repository.findByName(parameterType.getName());
+		if (parameterTypeEntity == null) {
+			return save(parameterType);
+		}
+		throw new BusinessException(
+				String.format("(%s) adlı kategori tanımlı olduğu için eklenmiyor.", parameterType.getName()));
+	}
+
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public Page<ParameterType> getPageAbleFilterList(ParameterTypeDto productEntryTypeDto, PageRequest pageable) {
+
+		BooleanExpression expression = QProductEntryType.productEntryType.isNotNull();
+		if (!Objects.isNull(productEntryTypeDto.getName())) {
+			expression = expression.and(QProductEntryType.productEntryType.name
+					.containsIgnoreCase(StringUtils.trimWhitespace(productEntryTypeDto.getName())));
+		}
+		if (!Objects.isNull(productEntryTypeDto.getEntityStatusType())) {
+			expression = expression.and(
+					QProductEntryType.productEntryType.entityStatusType.eq(productEntryTypeDto.getEntityStatusType()));
+		}
+		return repository.findAll(expression, pageable);
+	}
+
+	public List<ParameterType> getParameterTypeByStatusForActive() {
+		return repository.findByEntityStatusType(EntityStatusType.ACTIVE);
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public boolean deleteById(long categoryId) {
+
+		cancelled(find(categoryId));
+		return true;
+	}
+}

@@ -1,0 +1,5 @@
+package com.mansel.tombstone.mapper;
+
+public interface ProductEntryTypeMapper {
+
+}

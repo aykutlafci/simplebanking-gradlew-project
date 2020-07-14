@@ -1,0 +1,5 @@
+package com.mansel.tombstone.service;
+
+public class ProductEntryType {
+
+}

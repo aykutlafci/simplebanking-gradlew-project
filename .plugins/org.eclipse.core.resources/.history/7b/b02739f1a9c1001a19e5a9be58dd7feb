@@ -1,0 +1,44 @@
+package Service;  
+  
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import DAO.Student_DAO;
+import Model.Student;  
+  
+@Service  
+@Transactional  
+public class Student_Service_Imp implements Student_Service {  
+   
+    @Autowired  
+    private Student_DAO studentdaoStudent_DAO;  
+      
+    @Override  
+    public boolean saveStudent(Student student) {  
+        return studentdaoStudent_DAO.saveStudent(student);  
+    }  
+  
+    @Override  
+    public List<Student> getStudents() {  
+        return studentdaoStudent_DAO.getStudents();  
+    }  
+  
+    @Override  
+    public boolean deleteStudent(Student student) {  
+        return studentdaoStudent_DAO.deleteStudent(student);  
+    }  
+  
+    @Override  
+    public List<Student> getStudentByID(Student student) {  
+        return studentdaoStudent_DAO.getStudentByID(student);  
+    }  
+  
+    @Override  
+    public boolean updateStudent(Student student) {  
+        return studentdaoStudent_DAO.updateStudent(student);  
+    }  
+  
+}  

@@ -1,0 +1,10 @@
+package com.mansel.tombstone.model.dto;
+
+import lombok.Data;
+
+@Data
+public class ProductEntryTypeDto {
+	
+	private String name;
+
+}

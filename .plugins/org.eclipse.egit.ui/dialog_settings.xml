@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="2" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageWizardSel"/>
+	<list key="RepositorySelectionPage.UsedUris">
+		<item value="https://gitlab.eteration.com/academy/assignments/simplebanking.git"/>
+		<item value="https://gitlab.eteration.com:8080/academy/assignments/simplebanking.git"/>
+	</list>
+	<list key="EGit.KnownHosts">
+		<item value="bitbucket.org"/>
+		<item value="github.com"/>
+		<item value="git.eclipse.org"/>
+		<item value="gitlab.eteration.com"/>
+	</list>
+	<section name="GitImportWizard">
+	</section>
+</section>

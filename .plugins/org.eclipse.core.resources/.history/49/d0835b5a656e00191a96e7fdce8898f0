@@ -1,0 +1,61 @@
+package com.mansel.tombstone.mapper;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+import com.mansel.tombstone.constant.MapperConstant;
+import com.mansel.tombstone.model.dto.AddressDto;
+import com.mansel.tombstone.model.entitiy.Address;
+import com.mansel.tombstone.utils.DateUtils;
+
+@Mapper(componentModel = MapperConstant.MAPPER_SPRING_BEAN)
+public interface AddressMapper {
+
+	AddressMapper INSTANCE = Mappers.getMapper(AddressMapper.class);
+	CustomerMapper CM = Mappers.getMapper(CustomerMapper.class);
+	
+	default AddressDto convertToDto(Address entity) {
+		AddressDto dto = new AddressDto();
+		dto.setAddressDetail(entity.getAddressDetail());
+		dto.setCountry(entity.getCountry());
+		dto.setCity(entity.getCity());
+		dto.setId(entity.getId());
+		dto.setPostcode(entity.getPostcode());
+//		dto.setCustomerDto(CM.convertToDto(entity.getCustomer()));
+		dto.setAddressType(entity.getAddressType());
+
+		dto.setId(entity.getId());
+		dto.setCreateUserId(entity.getCreateUser());
+		dto.setCreationDate(DateUtils.convertToDateViaInstant(entity.getCreationDate()));
+		dto.setUpdateDate(DateUtils.convertToDateViaInstant(entity.getUpdateDate()));
+		dto.setUpdateUserId(entity.getUpdatedUser());
+		dto.setEntityStatusType(entity.getEntityStatusType());
+		return dto;
+	}
+
+	default Address convertToEntity(AddressDto dto) {   
+		Address entity = new Address();
+		entity.setId(dto.getId());
+		entity.setAddressDetail(dto.getAddressDetail());
+		entity.setCountry(dto.getCountry());
+		entity.setCity(dto.getCity());
+		entity.setPostcode(dto.getPostcode());
+        entity.setCustomer(CM.convertToEntity(dto.getCustomerDto()));
+		entity.setAddressType(dto.getAddressType());
+		
+		
+		entity.setCreateUser(dto.getCreateUserId());
+		
+		entity.setEntityStatusType(dto.getEntityStatusType());
+		return entity;
+	}
+
+	default Address convertToEntity(AddressDto dto, Address address) {
+		address.setAddressDetail(dto.getAddressDetail());
+		address.setCity(dto.getCity());
+		address.setCountry(dto.getCountry());
+		address.setPostcode(dto.getPostcode());
+		return address;
+		
+	}
+}
